@@ -62,24 +62,18 @@ geom.faces.push( new Face3( 0, 2, 1 ) );
 geom.computeFaceNormals();
 
 const material = new ShaderMaterial({
-    vertexShader: "#version 300 es\n" +
-        "\n" +
-        "void main() {\n" +
-        "\n" +
-        "\tgl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n" +
-        "\n" +
-        "}",
-    fragmentShader: "#version 300 es\n" +
-        "\n" +
-        "precision highp float;\n" +
-        "precision highp int;\n" +
-        "out vec4 out_FragColor;\n" +
-        "\n" +
-        "void main() {\n" +
-        "\n" +
-        "\tout_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );\n" +
-        "\n" +
-        "}"
+    vertexShader: `#version 300 es
+        void main() {
+            gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+        }`,
+    fragmentShader: `#version 300 es
+        precision highp float;
+        precision highp int;
+        out vec4 out_FragColor;
+    
+        void main() {
+            out_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );
+        }`
 });
 
 const object = new Mesh(geom, material);
