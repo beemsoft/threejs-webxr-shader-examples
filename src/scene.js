@@ -1,6 +1,5 @@
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js'
 import {
-    Color,
     Face3,
     Geometry,
     Group,
@@ -9,7 +8,7 @@ import {
     PerspectiveCamera,
     Scene,
     Vector3,
-    VertexColors,
+    Vector4,
     WebGLRenderer
 } from 'three';
 import { WEBGL } from 'three/examples/jsm/WebGL.js';
@@ -63,24 +62,24 @@ geom.vertices.push(v3);
 geom.faces.push( new Face3( 0, 2, 1 ) );
 geom.computeFaceNormals();
 
-geom.faces[0].vertexColors.push(new Color(1.0, 0.0, 0.0));
-geom.faces[0].vertexColors.push(new Color(0.0, 1.0, 0.0));
-geom.faces[0].vertexColors.push(new Color(0.0, 0.0, 1.0));
-
 const material = new ShaderMaterial({
-    vertexColors: true,
+    uniforms: {
+        fragCol: { value: new Vector4(0, 1, 1, 1) }
+    },
     vertexShader: `
-       varying vec3 vColor;
+        #version 300 es 
         
         void main() {
-           vColor = color;
            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
         }`,
     fragmentShader: `
-        varying vec3 vColor;
+        #version 300 es 
+        
+        uniform vec4 fragCol;
+        out vec4 outColor;
 
         void main(){
-            gl_FragColor = vec4( vColor, 1.0 );
+            outColor = fragCol;
         }`
 });
 
