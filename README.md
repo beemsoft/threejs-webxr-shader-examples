@@ -10,7 +10,7 @@ In the book, GLSL version 410 is used. WebGL version 2 is using GLSL ES version 
 ### More reading
 Another interesting read: [The Book of Shaders][book-of-shaders]
 
-###Credits:
+### Credits:
 For teleporting, [xr-locomotion-starter][xr-locomotion-starter] is used.
 
 ### Build steps:
