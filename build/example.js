@@ -51750,18 +51750,24 @@ geom.vertices.push(v3);
 geom.faces.push( new Face3( 0, 2, 1 ) );
 geom.computeFaceNormals();
 
+geom.faces[0].vertexColors.push(new Color(1.0, 0.0, 0.0));
+geom.faces[0].vertexColors.push(new Color(0.0, 1.0, 0.0));
+geom.faces[0].vertexColors.push(new Color(0.0, 0.0, 1.0));
+
 const material = new ShaderMaterial({
-    vertexShader: `#version 300 es
+    vertexColors: true,
+    vertexShader: `
+       varying vec3 vColor;
+        
         void main() {
-            gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+           vColor = color;
+           gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
         }`,
-    fragmentShader: `#version 300 es
-        precision highp float;
-        precision highp int;
-        out vec4 out_FragColor;
-    
-        void main() {
-            out_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );
+    fragmentShader: `
+        varying vec3 vColor;
+
+        void main(){
+            gl_FragColor = vec4( vColor, 1.0 );
         }`
 });
 
