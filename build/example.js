@@ -51738,36 +51738,47 @@ if ( WEBGL.isWebGL2Available() === false ) {
 }
 
 const geom = new Geometry();
-const v1 = new Vector3(-5, 0, -10);
-const v2 = new Vector3(-5, 5, -10);
-const v3 = new Vector3(5, 0, -10);
+const v1 = new Vector3(-4, -4, -10);
+const v2 = new Vector3(-4, 4, -10);
+const v3 = new Vector3(4, 4, -10);
+const v4 = new Vector3(4, -4, -10);
 
 geom.vertices.push(v1);
 geom.vertices.push(v2);
 geom.vertices.push(v3);
+geom.vertices.push(v4);
 
-// Define face orientation, front or back (using the right-hand rule)
-geom.faces.push( new Face3( 0, 2, 1 ) );
-geom.computeFaceNormals();
+geom.faces.push( new Face3( 0, 2, 1 ));
+geom.faces.push( new Face3( 0, 3, 2 ));
+
+geom.faces[0].vertexColors.push(new Color(1.0, 0.0, 0.0));
+geom.faces[0].vertexColors.push(new Color(0.0, 1.0, 0.0));
+geom.faces[0].vertexColors.push(new Color( 0.0, 1.0, 1.0));
+geom.faces[1].vertexColors.push(new Color(1.0, 0.0, 0.0));
+geom.faces[1].vertexColors.push(new Color(0.0, 1.0, 0.0));
+geom.faces[1].vertexColors.push(new Color( 0.0, 1.0, 1.0));
+
+geom.faceVertexUvs[0].push( [ new Vector2(0.0, 0.0), new Vector2( 1.0, 1.0), new Vector2(0.0, 1.0) ]);
+geom.faceVertexUvs[0].push( [ new Vector2(0.0, 0.0), new Vector2( 1.0, 0.0), new Vector2(1.0, 1.0) ]);
 
 const material = new ShaderMaterial({
-    uniforms: {
-        fragCol: { value: new Vector4(0, 1, 1, 1) }
-    },
     vertexShader: `
         #version 300 es 
         
+        out vec2 fragUV;
+        
         void main() {
            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+           fragUV = uv;
         }`,
     fragmentShader: `
         #version 300 es 
         
-        uniform vec4 fragCol;
+        in vec2 fragUV;
         out vec4 outColor;
 
         void main(){
-            outColor = fragCol;
+            outColor = vec4(fragUV, 0.0, 1.0);
         }`
 });
 
