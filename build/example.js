@@ -51761,7 +51761,13 @@ geom.faces[1].vertexColors.push(new Color( 0.0, 1.0, 1.0));
 geom.faceVertexUvs[0].push( [ new Vector2(0.0, 0.0), new Vector2( 1.0, 1.0), new Vector2(0.0, 1.0) ]);
 geom.faceVertexUvs[0].push( [ new Vector2(0.0, 0.0), new Vector2( 1.0, 0.0), new Vector2(1.0, 1.0) ]);
 
+const loader = new TextureLoader();
+const texture = loader.load("./images/parrot.png");
+
 const material = new ShaderMaterial({
+    uniforms: {
+        "parrotTex": { value: texture }
+    },
     vertexShader: `
         #version 300 es 
         
@@ -51774,11 +51780,13 @@ const material = new ShaderMaterial({
     fragmentShader: `
         #version 300 es 
         
+        uniform sampler2D parrotTex;
+        
         in vec2 fragUV;
         out vec4 outColor;
 
         void main(){
-            outColor = vec4(fragUV, 0.0, 1.0);
+            outColor = texture(parrotTex, fragUV);
         }`
 });
 
