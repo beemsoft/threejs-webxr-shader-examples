@@ -51763,19 +51763,22 @@ geom.faceVertexUvs[0].push( [ new Vector2(0.0, 0.0), new Vector2( 1.0, 0.0), new
 
 const loader = new TextureLoader();
 const texture = loader.load("./images/parrot.png");
+texture.wrapS = texture.wrapT = RepeatWrapping;
 
 const material = new ShaderMaterial({
     uniforms: {
-        "parrotTex": { value: texture }
+        "parrotTex": { value: texture },
+        "time": { value: 1 }
     },
     vertexShader: `
         #version 300 es 
         
+        uniform float time;
         out vec2 fragUV;
         
         void main() {
            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-           fragUV = uv;
+           fragUV = uv + vec2(1.0, 0.0) * time;
         }`,
     fragmentShader: `
         #version 300 es 
@@ -51798,6 +51801,7 @@ document.body.appendChild( VRButton.createButton( renderer ) );
 const rafCallbacks = new Set();
 renderer.setAnimationLoop(function (time) {
     TWEEN.update(time);
+    material.uniforms[ 'time' ].value += 1.0 / 600.0;
     rafCallbacks.forEach(cb => cb(time));
     renderer.render(scene, camera);
 });
