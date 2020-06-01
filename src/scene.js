@@ -82,6 +82,7 @@ texture.wrapS = texture.wrapT = RepeatWrapping;
 const material = new ShaderMaterial({
     uniforms: {
         "parrotTex": { value: texture },
+        "brightness": { value: 0.5 },
         "time": { value: 1 }
     },
     vertexShader: `
@@ -98,12 +99,13 @@ const material = new ShaderMaterial({
         #version 300 es 
         
         uniform sampler2D parrotTex;
+        uniform float brightness;
         
         in vec2 fragUV;
         out vec4 outColor;
 
         void main(){
-            outColor = texture(parrotTex, fragUV);
+            outColor = texture(parrotTex, fragUV) * brightness;
         }`
 });
 
