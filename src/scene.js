@@ -112,7 +112,7 @@ const material = new ShaderMaterial({
             vec4 parrot = texture(parrotTex, fragUV);
             vec4 checker = texture(checkerboardTex, fragUV);
             
-            outColor = mix(parrot, checker, 0.5);
+            outColor = mix(checker, parrot, checker.r);
         }`
 });
 
