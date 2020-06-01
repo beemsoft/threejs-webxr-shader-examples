@@ -51762,12 +51762,16 @@ geom.faceVertexUvs[0].push( [ new Vector2(0.0, 0.0), new Vector2( 1.0, 1.0), new
 geom.faceVertexUvs[0].push( [ new Vector2(0.0, 0.0), new Vector2( 1.0, 0.0), new Vector2(1.0, 1.0) ]);
 
 const loader = new TextureLoader();
-const texture = loader.load("./images/parrot.png");
-texture.wrapS = texture.wrapT = RepeatWrapping;
+const parrotTexture = loader.load("./images/parrot.png");
+parrotTexture.wrapS = parrotTexture.wrapT = RepeatWrapping;
+const checkerboardTexture = loader.load("./images/checker.jpg");
+checkerboardTexture.wrapS = checkerboardTexture.wrapT = RepeatWrapping;
 
 const material = new ShaderMaterial({
     uniforms: {
-        "parrotTex": { value: texture },
+        "parrotTex": { value: parrotTexture },
+        "checkerboardTex": { value: checkerboardTexture },
+        "brightness": { value: 0.5 },
         "time": { value: 1 }
     },
     vertexShader: `
@@ -51784,12 +51788,17 @@ const material = new ShaderMaterial({
         #version 300 es 
         
         uniform sampler2D parrotTex;
+        uniform sampler2D checkerboardTex;
+        uniform float brightness;
         
         in vec2 fragUV;
         out vec4 outColor;
 
         void main(){
-            outColor = texture(parrotTex, fragUV);
+            vec4 parrot = texture(parrotTex, fragUV);
+            vec4 checker = texture(checkerboardTex, fragUV);
+            
+            outColor = mix(parrot, checker, 0.5);
         }`
 });
 
