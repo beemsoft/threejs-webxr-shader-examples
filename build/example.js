@@ -51737,72 +51737,59 @@ if ( WEBGL.isWebGL2Available() === false ) {
     document.body.appendChild( WEBGL.getWebGL2ErrorMessage() );
 }
 
-const geom = new Geometry();
-const v1 = new Vector3(-4, -4, -10);
-const v2 = new Vector3(-4, 4, -10);
-const v3 = new Vector3(4, 4, -10);
-const v4 = new Vector3(4, -4, -10);
+function buildMesh(width, height, position) {
+    const geom = new Geometry();
+    const v1 = new Vector3(-width + position.x, -height + position.y, position.z);
+    const v2 = new Vector3(-width + position.x, height, position.z);
+    const v3 = new Vector3(width + position.x, height + position.y, position.z);
+    const v4 = new Vector3(width + position.x, -height + position.y, position.z);
 
-geom.vertices.push(v1);
-geom.vertices.push(v2);
-geom.vertices.push(v3);
-geom.vertices.push(v4);
+    geom.vertices.push(v1);
+    geom.vertices.push(v2);
+    geom.vertices.push(v3);
+    geom.vertices.push(v4);
 
-geom.faces.push( new Face3( 0, 2, 1 ));
-geom.faces.push( new Face3( 0, 3, 2 ));
+    geom.faces.push( new Face3( 0, 2, 1 ));
+    geom.faces.push( new Face3( 0, 3, 2 ));
 
-geom.faces[0].vertexColors.push(new Color(1.0, 0.0, 0.0));
-geom.faces[0].vertexColors.push(new Color(0.0, 1.0, 0.0));
-geom.faces[0].vertexColors.push(new Color( 0.0, 1.0, 1.0));
-geom.faces[1].vertexColors.push(new Color(1.0, 0.0, 0.0));
-geom.faces[1].vertexColors.push(new Color(0.0, 1.0, 0.0));
-geom.faces[1].vertexColors.push(new Color( 0.0, 1.0, 1.0));
+    geom.faceVertexUvs[0].push( [ new Vector2(0.0, 0.0), new Vector2( 1.0, 1.0), new Vector2(0.0, 1.0) ]);
+    geom.faceVertexUvs[0].push( [ new Vector2(0.0, 0.0), new Vector2( 1.0, 0.0), new Vector2(1.0, 1.0) ]);
+    return geom;
+}
 
-geom.faceVertexUvs[0].push( [ new Vector2(0.0, 0.0), new Vector2( 1.0, 1.0), new Vector2(0.0, 1.0) ]);
-geom.faceVertexUvs[0].push( [ new Vector2(0.0, 0.0), new Vector2( 1.0, 0.0), new Vector2(1.0, 1.0) ]);
+const charMesh = buildMesh(0.25, 0.5, new Vector3(0.0, 0.0, -4.0));
 
 const loader = new TextureLoader();
-const parrotTexture = loader.load("./images/parrot.png");
-parrotTexture.wrapS = parrotTexture.wrapT = RepeatWrapping;
-const checkerboardTexture = loader.load("./images/checker.jpg");
-checkerboardTexture.wrapS = checkerboardTexture.wrapT = RepeatWrapping;
+const greenManTexture = loader.load("./images/alien.png");
 
 const material = new ShaderMaterial({
     uniforms: {
-        "parrotTex": { value: parrotTexture },
-        "checkerboardTex": { value: checkerboardTexture },
-        "brightness": { value: 0.5 },
-        "time": { value: 1 }
+        "greenMan": { value: greenManTexture }
     },
     vertexShader: `
         #version 300 es 
         
-        uniform float time;
         out vec2 fragUV;
         
         void main() {
            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-           fragUV = uv + vec2(1.0, 0.0) * time;
+           fragUV = uv;
         }`,
     fragmentShader: `
         #version 300 es 
         
-        uniform sampler2D parrotTex;
-        uniform sampler2D checkerboardTex;
-        uniform float brightness;
+        uniform sampler2D greenMan;
         
         in vec2 fragUV;
-        out vec4 outColor;
+        out vec4 outCol;
 
         void main(){
-            vec4 parrot = texture(parrotTex, fragUV);
-            vec4 checker = texture(checkerboardTex, fragUV);
-            
-            outColor = mix(checker, parrot, checker.r);
+            outCol = texture(greenMan, fragUV);
+            if (outCol.a < 1.0) discard;
         }`
 });
 
-const object = new Mesh(geom, material);
+const object = new Mesh(charMesh, material);
 scene.add(object);
 
 document.body.appendChild( VRButton.createButton( renderer ) );
@@ -51810,7 +51797,6 @@ document.body.appendChild( VRButton.createButton( renderer ) );
 const rafCallbacks = new Set();
 renderer.setAnimationLoop(function (time) {
     TWEEN.update(time);
-    material.uniforms[ 'time' ].value += 1.0 / 600.0;
     rafCallbacks.forEach(cb => cb(time));
     renderer.render(scene, camera);
 });
