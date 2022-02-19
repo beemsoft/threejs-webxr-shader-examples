@@ -1,18 +1,16 @@
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js'
 import {
-    Face3,
-    Geometry,
+    BufferGeometry,
+    Float32BufferAttribute,
     Group,
     Mesh,
-    ShaderMaterial,
     PerspectiveCamera,
     Scene,
+    ShaderMaterial,
     TextureLoader,
-    Vector2,
     Vector3,
     WebGLRenderer
 } from 'three';
-import { WEBGL } from 'three/examples/jsm/WebGL.js';
 import {VRButton} from 'three/examples/jsm/webxr/VRButton.js';
 import TWEEN from '@tweenjs/tween.js/dist/tween.esm.js';
 
@@ -46,27 +44,28 @@ function onWindowResize() {
 window.addEventListener('resize', onWindowResize, false);
 onWindowResize();
 
-if ( WEBGL.isWebGL2Available() === false ) {
-    document.body.appendChild( WEBGL.getWebGL2ErrorMessage() );
-}
-
 function buildMesh(width, height, position) {
-    const geom = new Geometry();
-    const v1 = new Vector3(-width + position.x, -height + position.y, position.z);
-    const v2 = new Vector3(-width + position.x, height, position.z);
-    const v3 = new Vector3(width + position.x, height + position.y, position.z);
-    const v4 = new Vector3(width + position.x, -height + position.y, position.z);
+    const geom = new BufferGeometry();
+    const positions = new Float32Array([
+     -width + position.x, -height + position.y, position.z,
+     -width + position.x, height, position.z,
+      width + position.x, height + position.y, position.z,
+      width + position.x, -height + position.y, position.z
+    ]);
 
-    geom.vertices.push(v1);
-    geom.vertices.push(v2);
-    geom.vertices.push(v3);
-    geom.vertices.push(v4);
+    geom.setIndex([0,2,1, 0,3,2]);
 
-    geom.faces.push( new Face3( 0, 2, 1 ));
-    geom.faces.push( new Face3( 0, 3, 2 ));
+    const uvs = new Float32Array([
+        0.0, 0.0,
+        0.0, 1.0,
+        1.0, 1.0,
+        1.0, 0.0
+    ]);
 
-    geom.faceVertexUvs[0].push( [ new Vector2(0.0, 0.0), new Vector2( 1.0, 1.0), new Vector2(0.0, 1.0) ]);
-    geom.faceVertexUvs[0].push( [ new Vector2(0.0, 0.0), new Vector2( 1.0, 0.0), new Vector2(1.0, 1.0) ]);
+    const positionAttribute = new Float32BufferAttribute( positions, 3 );
+    geom.setAttribute( 'position', positionAttribute );
+    const uvAttribute = new Float32BufferAttribute( uvs, 2 );
+    geom.setAttribute( 'uv', uvAttribute );
     return geom;
 }
 
@@ -80,8 +79,6 @@ const material = new ShaderMaterial({
         "greenMan": { value: greenManTexture }
     },
     vertexShader: `
-        #version 300 es 
-        
         out vec2 fragUV;
         
         void main() {
@@ -89,16 +86,13 @@ const material = new ShaderMaterial({
            fragUV = uv;
         }`,
     fragmentShader: `
-        #version 300 es 
-        
         uniform sampler2D greenMan;
         
         in vec2 fragUV;
-        out vec4 outCol;
 
         void main(){
-            outCol = texture(greenMan, fragUV);
-            if (outCol.a < 1.0) discard;
+            gl_FragColor = texture(greenMan, fragUV);
+            if (gl_FragColor.a < 1.0) discard;
         }`
 });
 
