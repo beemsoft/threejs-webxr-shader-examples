@@ -8,7 +8,6 @@ import {
     TextureLoader,
     AdditiveBlending,
     RepeatWrapping,
-    SphereBufferGeometry,
     BackSide,
     SphereGeometry,
     Vector3
@@ -66,7 +65,7 @@ const sky2sphere = new Mesh(sky2geometry, sky2material);
 sky2sphere.name = 'sky2sphere';
 cameraGroup.add(sky2sphere);
 
-const blinkerSphereGeometry = new SphereBufferGeometry(0.3, 64, 8, 0, Math.PI*2, 0, Math.PI * 0.85);
+const blinkerSphereGeometry = new SphereGeometry(0.3, 64, 8, 0, Math.PI*2, 0, Math.PI * 0.85);
 blinkerSphereGeometry.translate(0,0.3,0);
 const blinkerSphereMaterial = new MeshBasicMaterial({
     side: BackSide,

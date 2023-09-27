@@ -2,7 +2,7 @@
 
 I'm reading the book "Practical Shader Development: Vertex and Fragment Shaders for Game Developers" (Kyle Halladay, April 2019).
 From the start, I have tried to implement the examples in WebXR using three.js with WebGL version 2.
-A nice challenge, since all examples in the book have been implemented in openFrameworks.
+A nice challenge, since all examples in the book have been implemented in [openFrameworks](https://openframeworks.cc/).
 
 In the book, GLSL version 410 is used. WebGL version 2 is using GLSL ES version 300
 (See: [GLSL versions][GLSL-Versions])

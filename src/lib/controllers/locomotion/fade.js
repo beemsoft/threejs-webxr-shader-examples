@@ -31,7 +31,7 @@ function locomotion(offset) {
         .start();
 }
 
-const blinkerSphereGeometry = new SphereBufferGeometry(0.3, 16, 16);
+const blinkerSphereGeometry = new SphereGeometry(0.3, 16, 16);
 blinkerSphereGeometry.translate(0,0.3,0);
 const blinkerSphereMaterial = new MeshBasicMaterial({
     side: BackSide,
