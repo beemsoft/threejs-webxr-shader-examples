@@ -6,7 +6,7 @@
   "scripts": {
     "start": "npm run  build | node ./",
     "build": "rollup -c --bundleConfigAsCjs",
-    "develop": "rollup -w -c --bundleConfigAsCjs",
+    "develop": "rollup -w -c --bundleConfigAsCjs | serve",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -23,6 +23,7 @@
     "rollup-plugin-commonjs": "^10.1.0",
     "terser": "^5.20.0",
     "three": "^0.156.1",
-    "webxr-polyfill": "^2.0.3"
+    "webxr-polyfill": "^2.0.3",
+    "serve": "^14.2.1"
   }
 }
