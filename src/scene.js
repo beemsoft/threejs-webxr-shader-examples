@@ -41,19 +41,20 @@ function onWindowResize() {
     camera.updateProjectionMatrix();
     renderer.setSize(w, h);
 }
+
 window.addEventListener('resize', onWindowResize, false);
 onWindowResize();
 
 function buildMesh(width, height, position) {
     const geom = new BufferGeometry();
     const positions = new Float32Array([
-     -width + position.x, -height + position.y, position.z,
-     -width + position.x, height, position.z,
-      width + position.x, height + position.y, position.z,
-      width + position.x, -height + position.y, position.z
+        -width + position.x, -height + position.y, position.z,
+        -width + position.x, height, position.z,
+        width + position.x, height + position.y, position.z,
+        width + position.x, -height + position.y, position.z
     ]);
 
-    geom.setIndex([0,2,1, 0,3,2]);
+    geom.setIndex([0, 2, 1, 0, 3, 2]);
 
     const uvs = new Float32Array([
         0.0, 0.0,
@@ -62,21 +63,23 @@ function buildMesh(width, height, position) {
         1.0, 0.0
     ]);
 
-    const positionAttribute = new Float32BufferAttribute( positions, 3 );
-    geom.setAttribute( 'position', positionAttribute );
-    const uvAttribute = new Float32BufferAttribute( uvs, 2 );
-    geom.setAttribute( 'uv', uvAttribute );
+    const positionAttribute = new Float32BufferAttribute(positions, 3);
+    geom.setAttribute('position', positionAttribute);
+    const uvAttribute = new Float32BufferAttribute(uvs, 2);
+    geom.setAttribute('uv', uvAttribute);
     return geom;
 }
 
-const charMesh = buildMesh(0.25, 0.5, new Vector3(0.0, 0.0, -4.0));
+const greenManMesh = buildMesh(0.25, 0.5, new Vector3(0.0, 0.0, -4.0));
+const backgroundMesh = buildMesh(5.0, 5.0, new Vector3(0.0, 0.0, -9));
 
 const loader = new TextureLoader();
 const greenManTexture = loader.load("./images/alien.png");
+const backgroundTexture = loader.load("./images/forest.png");
 
 const material = new ShaderMaterial({
     uniforms: {
-        "greenMan": { value: greenManTexture }
+        "img": {value: greenManTexture}
     },
     vertexShader: `
         out vec2 fragUV;
@@ -86,20 +89,46 @@ const material = new ShaderMaterial({
            fragUV = uv;
         }`,
     fragmentShader: `
-        uniform sampler2D greenMan;
+        uniform sampler2D img;
         
         in vec2 fragUV;
 
         void main(){
-            gl_FragColor = texture(greenMan, fragUV);
+            gl_FragColor = texture(img, fragUV);
             if (gl_FragColor.a < 1.0) discard;
         }`
 });
 
-const object = new Mesh(charMesh, material);
-scene.add(object);
+const material2 = new ShaderMaterial({
+    uniforms: {
+        "img": {value: backgroundTexture}
+    },
+    vertexShader: `
+        out vec2 fragUV;
+        
+        void main() {
+           gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+           fragUV = uv;
+        }`,
+    fragmentShader: `
+        uniform sampler2D img;
+        
+        in vec2 fragUV;
 
-document.body.appendChild( VRButton.createButton( renderer ) );
+        void main(){
+            gl_FragColor = texture(img, fragUV);
+            if (gl_FragColor.a < 1.0) discard;
+        }`
+});
+
+const greenMan = new Mesh(greenManMesh, material);
+scene.add(greenMan);
+
+// material.uniforms["img"].value = backgroundTexture;
+const backgound = new Mesh(backgroundMesh, material2);
+scene.add(backgound);
+
+document.body.appendChild(VRButton.createButton(renderer));
 
 const rafCallbacks = new Set();
 renderer.setAnimationLoop(function (time) {
