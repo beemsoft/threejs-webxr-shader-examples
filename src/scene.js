@@ -1,6 +1,7 @@
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js'
 import {
     BufferGeometry,
+    CustomBlending,
     Float32BufferAttribute,
     Group,
     Mesh,
@@ -72,10 +73,12 @@ function buildMesh(width, height, position) {
 
 const greenManMesh = buildMesh(0.25, 0.5, new Vector3(0.0, 0.0, -4.0));
 const backgroundMesh = buildMesh(5.0, 5.0, new Vector3(0.0, 0.0, -9));
+const clouddMesh = buildMesh(1, 1, new Vector3(-2, 1.0, -8));
 
 const loader = new TextureLoader();
 const greenManTexture = loader.load("./images/alien.png");
 const backgroundTexture = loader.load("./images/forest.png");
+const cloudTexture = loader.load("./images/cloud.png");
 
 const material = new ShaderMaterial({
     uniforms: {
@@ -117,16 +120,40 @@ const material2 = new ShaderMaterial({
 
         void main(){
             gl_FragColor = texture(img, fragUV);
-            if (gl_FragColor.a < 1.0) discard;
         }`
+});
+
+const material3 = new ShaderMaterial({
+    uniforms: {
+        "img": {value: cloudTexture}
+    },
+    vertexShader: `
+        out vec2 fragUV;
+        
+        void main() {
+           gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+           fragUV = uv;
+        }`,
+    fragmentShader: `
+        uniform sampler2D img;
+        
+        in vec2 fragUV;
+
+        void main(){
+            gl_FragColor = texture(img, fragUV);
+            if (gl_FragColor.a > 0.8) gl_FragColor.a = 0.8;
+        }`,
+    blending: CustomBlending
 });
 
 const greenMan = new Mesh(greenManMesh, material);
 scene.add(greenMan);
 
-// material.uniforms["img"].value = backgroundTexture;
 const backgound = new Mesh(backgroundMesh, material2);
 scene.add(backgound);
+
+const cloud = new Mesh(clouddMesh, material3);
+scene.add(cloud);
 
 document.body.appendChild(VRButton.createButton(renderer));
 
